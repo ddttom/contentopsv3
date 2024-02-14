@@ -1,0 +1,14 @@
+.section .text-wrapper {
+    max-width: 77pc;
+    padding: 0 1rem;
+}
+
+.text-wrapper h2 {
+    text-align: center;
+    font-size: 40px;
+    line-height: 3.5rem;
+}
+
+@media (width >= 1024px) {
+    
+}
