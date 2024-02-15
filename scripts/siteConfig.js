@@ -14,7 +14,7 @@ export function alert(message) {
 }
 
 export async function loadConfiguration() {
-  const configUrl = `${window.location.origin}/config/config.json`;
+  const configUrl = `${window.location.origin}/config/variables.json`;
   try {
     const response = await fetch(configUrl);
     if (!response.ok) throw new Error(`Failed to fetch config: ${response.status}`);
@@ -42,9 +42,17 @@ export function extractJsonLd(parsedJson) {
 }
 export function replacePlaceHolders(content) {
   const today = new Date().toISOString().split('T')[0];
+  let href = '';
+  const canonicalLink = document.querySelector('link[rel="canonical"]');
+  if (canonicalLink) { // Make sure the element was found
+    href = canonicalLink.href;
+  }
+
   return content
     .replaceAll('$twitter:image', document.querySelector('meta[name="twitter:image"]')?.getAttribute('content') || '')
     .replaceAll('$meta:longdescription', document.querySelector('meta[name="longdescription"]')?.getAttribute('content') || '')
+    .replaceAll('$twitter:description', document.querySelector('meta[name="twitter:description"]')?.getAttribute('content') || '')
+    .replaceAll('$page:canonical', href)
     .replaceAll('$system:date', today)
     .replaceAll('$company:name', siteConfig.companyName)
     .replaceAll('$company:logo', siteConfig.companyLogo)
@@ -67,6 +75,7 @@ export async function handleMetadataJsonLd() {
     jsonLdMetaElement.remove();
     // assume we have an url, if not we have a role -  construct url on the fly
     let jsonDataUrl = content;
+    let jsonIsReal = true;
     try {
     // Attempt to parse the content as a URL
     // eslint-disable-next-line no-new
@@ -74,6 +83,7 @@ export async function handleMetadataJsonLd() {
     } catch (error) {
     // Content is not a URL, construct the JSON-LD URL based on content and current domain
       jsonDataUrl = `${window.location.origin}/config/json-ld/${content}.json`;
+      jsonIsReal = false;
     }
     try {
       const resp = await fetch(jsonDataUrl);
@@ -81,7 +91,9 @@ export async function handleMetadataJsonLd() {
         throw new Error(`Failed to fetch JSON-LD content: ${resp.status}`);
       }
       let json = await resp.json();
-      json = extractJsonLd(json);
+      if (jsonIsReal === false) {
+        json = extractJsonLd(json);
+      }
       let jsonString = JSON.stringify(json);
       jsonString = replacePlaceHolders(jsonString);
       // Create and append a new script element with the processed JSON-LD data
