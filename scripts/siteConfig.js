@@ -4,9 +4,6 @@ import {
 
 export const siteConfig = {};
 
-export function toCamelCase(str) {
-  return str.replace(/:([a-z])/g, (_, char) => char.toUpperCase());
-}
 
 export function alert(message) {
   // eslint-disable-next-line no-console
@@ -21,16 +18,32 @@ export async function loadConfiguration() {
     if (!response.ok) {
       throw new Error(`Failed to fetch config: ${response.status} ${response.statusText}`);
     }
-
     const jsonData = await response.json();
-
-    const companyData = {};
     // eslint-disable-next-line no-restricted-syntax
     for (const entry of jsonData.data) {
-      companyData[entry.Item] = entry.Value;
+      siteConfig[entry.Item] = entry.Value;
     }
+    const today = new Date().toISOString().split('T')[0];
+    let href = '';
+    const canonicalLink = document.querySelector('link[rel="canonical"]');
+    if (canonicalLink) { // Make sure the element was found
+      href = canonicalLink.href;
+    }
+  
+    siteConfig["$page:canonical"] = href;
+    siteConfig["$system:date"] = today;
+    const metaTags = document.querySelectorAll('meta');
 
-    return companyData;
+    metaTags.forEach(metaTag => {
+    const name = metaTag.getAttribute('name');
+    const content = metaTag.getAttribute('content');
+
+    if (name && content) {
+     siteConfig["$" + name] = content;
+    }
+});
+    
+  
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(`Configuration load error: ${error.message}`);
@@ -55,26 +68,20 @@ export function extractJsonLd(parsedJson) {
   }
   return parsedJson;
 }
-export function replacePlaceHolders(content) {
-  const today = new Date().toISOString().split('T')[0];
-  let href = '';
-  const canonicalLink = document.querySelector('link[rel="canonical"]');
-  if (canonicalLink) { // Make sure the element was found
-    href = canonicalLink.href;
-  }
 
-  return content
-    .replaceAll('$twitter:image', document.querySelector('meta[name="twitter:image"]')?.getAttribute('content') || '')
-    .replaceAll('$meta:longdescription', document.querySelector('meta[name="longdescription"]')?.getAttribute('content') || '')
-    .replaceAll('$twitter:description', document.querySelector('meta[name="twitter:description"]')?.getAttribute('content') || '')
-    .replaceAll('$page:canonical', href)
-    .replaceAll('$system:date', today)
-    .replaceAll('$company:name', siteConfig.companyName)
-    .replaceAll('$company:logo', siteConfig.companyLogo)
-    .replaceAll('$company:url', siteConfig.companyUrl)
-    .replaceAll('$company:email', siteConfig.companyEmail)
-    .replaceAll('$company:phone', siteConfig.companyTelephone)
-    .replaceAll('$company:telephone', siteConfig.companyTelephone);
+function replaceTokens(data, text) {
+  let ret = text;
+  // eslint-disable-next-line no-restricted-syntax
+  for (const key in data) {
+    const value = data[key];
+    ret = ret.replaceAll(key, value);
+  return ret;
+}
+
+
+export function replacePlaceHolders(content) {
+   const updatedText = replaceTokens(data, text);
+  return updatedText;
 }
 
 export async function handleMetadataJsonLd() {
