@@ -14,24 +14,30 @@ export function alert(message) {
 }
 
 export async function loadConfiguration() {
-  const configUrl = `${window.location.origin}/config/variables.json`;
+  const configUrl = new URL('/config/variables.json', window.location.origin);
+
   try {
     const response = await fetch(configUrl);
-    if (!response.ok) throw new Error(`Failed to fetch config: ${response.status}`);
-    const { jsonData } = await response.json();
+    if (!response.ok) {
+      throw new Error(`Failed to fetch config: ${response.status} ${response.statusText}`);
+    }
+
+    const jsonData = await response.json();
+
     const companyData = {};
-    // Iterate through the 'data' array
     // eslint-disable-next-line no-restricted-syntax
     for (const entry of jsonData.data) {
-      const item = entry.Item;
-      const value = entry.Value;
-      // Add the item and value to the associative array
-      companyData[item] = value;
+      companyData[entry.Item] = entry.Value;
     }
+
+    return companyData;
   } catch (error) {
-    alert(`Configuration load error: ${error.message}`);
+    // eslint-disable-next-line no-console
+    console.error(`Configuration load error: ${error.message}`);
+    throw error; // Rethrow for potential handling at a higher level
   }
 }
+
 export function extractJsonLd(parsedJson) {
   const jsonLd = { };
   const hasDataArray = 'data' in parsedJson && Array.isArray(parsedJson.data);
