@@ -18,27 +18,36 @@ export async function loadConfiguration() {
   try {
     const response = await fetch(configUrl);
     if (!response.ok) throw new Error(`Failed to fetch config: ${response.status}`);
-    const { data } = await response.json();
-    data.forEach(({ Item, Value }) => {
-      const key = toCamelCase(Item);
-      siteConfig[key] = Value;
-    });
+    const { jsonData } = await response.json();
+    const companyData = {};
+    // Iterate through the 'data' array
+    // eslint-disable-next-line no-restricted-syntax
+    for (const entry of jsonData.data) {
+      const item = entry.Item;
+      const value = entry.Value;
+      // Add the item and value to the associative array
+      companyData[item] = value;
+    }
   } catch (error) {
     alert(`Configuration load error: ${error.message}`);
   }
 }
 export function extractJsonLd(parsedJson) {
   const jsonLd = { };
-
-  parsedJson.data.forEach((item) => {
-    let key = item.Item.trim().toLowerCase();
-    if (key === 'type' || key === 'context') {
-      key = `@${key}`;
-    }
-    const value = item.Value.trim();
-    jsonLd[key] = value;
-  });
-  return jsonLd;
+  const hasDataArray = 'data' in parsedJson && Array.isArray(parsedJson.data);
+  if (hasDataArray) {
+    parsedJson.data.forEach((item) => {
+      let key = item.Item.trim().toLowerCase();
+      const reservedKeySet = new Set(['type', 'context', 'id', 'value', 'reverse', 'container', 'graph']);
+      if (reservedKeySet.has(key)) {
+        key = `@${key}`;
+      }
+      const value = item.Value.trim();
+      jsonLd[key] = value;
+    });
+    return jsonLd;
+  }
+  return parsedJson;
 }
 export function replacePlaceHolders(content) {
   const today = new Date().toISOString().split('T')[0];
@@ -75,7 +84,7 @@ export async function handleMetadataJsonLd() {
     jsonLdMetaElement.remove();
     // assume we have an url, if not we have a role -  construct url on the fly
     let jsonDataUrl = content;
-    let jsonIsReal = true;
+
     try {
     // Attempt to parse the content as a URL
     // eslint-disable-next-line no-new
@@ -83,7 +92,6 @@ export async function handleMetadataJsonLd() {
     } catch (error) {
     // Content is not a URL, construct the JSON-LD URL based on content and current domain
       jsonDataUrl = `${window.location.origin}/config/json-ld/${content}.json`;
-      jsonIsReal = false;
     }
     try {
       const resp = await fetch(jsonDataUrl);
@@ -91,9 +99,7 @@ export async function handleMetadataJsonLd() {
         throw new Error(`Failed to fetch JSON-LD content: ${resp.status}`);
       }
       let json = await resp.json();
-      if (jsonIsReal === false) {
-        json = extractJsonLd(json);
-      }
+      json = extractJsonLd(json);
       let jsonString = JSON.stringify(json);
       jsonString = replacePlaceHolders(jsonString);
       // Create and append a new script element with the processed JSON-LD data
