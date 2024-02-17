@@ -172,13 +172,20 @@ export async function initialize() {
     removeCommentBlocks(main);
     handleMetadataJsonLd(main);
     const metadataNames = [
-      'pageAuthor',
+      'pageauthor',
       'pagereviewdate',
       'pageembargodate',
       'pagepublisheddate',
       'pagecopyright',
       'pagecopyright-cc',
     ];
+    const firstH1 = document.querySelector('h1');
+    if (firstH1) {
+      // Construct the string you want to append
+      const appendString = `<br>Word Count = ${siteConfig['page:wordcount']}, <strong>${siteConfig['page:readspeed']} </strong>minute(s) to read this page.`;
+      // Append the constructed string to the h1 element's current content
+      firstH1.textContent += appendString;
+    }
 
     // Loop through the array of metadata names
     metadataNames.forEach((name) => {
