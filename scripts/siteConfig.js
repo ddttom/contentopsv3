@@ -4,7 +4,6 @@ import {
 
 export const siteConfig = {};
 
-
 export function alert(message) {
   // eslint-disable-next-line no-console
   console.error(message);
@@ -29,21 +28,18 @@ export async function loadConfiguration() {
     if (canonicalLink) { // Make sure the element was found
       href = canonicalLink.href;
     }
-  
-    siteConfig["$page:canonical"] = href;
-    siteConfig["$system:date"] = today;
+    siteConfig['$page:canonical'] = href;
+    siteConfig['$system:date'] = today;
     const metaTags = document.querySelectorAll('meta');
 
-    metaTags.forEach(metaTag => {
-    const name = metaTag.getAttribute('name');
-    const content = metaTag.getAttribute('content');
+    metaTags.forEach((metaTag) => {
+      const name = metaTag.getAttribute('name');
+      const content = metaTag.getAttribute('content');
 
-    if (name && content) {
-     siteConfig["$" + name] = content;
-    }
-});
-    
-  
+      if (name && content) {
+        siteConfig[`$${name}`] = content;
+      }
+    });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(`Configuration load error: ${error.message}`);
@@ -71,17 +67,12 @@ export function extractJsonLd(parsedJson) {
 
 function replaceTokens(data, text) {
   let ret = text;
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line no-restricted-syntax, guard-for-in
   for (const key in data) {
     const value = data[key];
     ret = ret.replaceAll(key, value);
+  }
   return ret;
-}
-
-
-export function replacePlaceHolders(content) {
-   const updatedText = replaceTokens(data, text);
-  return updatedText;
 }
 
 export async function handleMetadataJsonLd() {
@@ -114,7 +105,7 @@ export async function handleMetadataJsonLd() {
       let json = await resp.json();
       json = extractJsonLd(json);
       let jsonString = JSON.stringify(json);
-      jsonString = replacePlaceHolders(jsonString);
+      jsonString = replaceTokens(siteConfig, jsonString);
       // Create and append a new script element with the processed JSON-LD data
       const script = document.createElement('script');
       script.type = 'application/ld+json';
