@@ -28,6 +28,18 @@ export async function loadConfiguration() {
     if (canonicalLink) { // Make sure the element was found
       href = canonicalLink.href;
     }
+
+    const text = document.body.innerText; // Get the visible text content of the body
+    const wordCount = text.split(/\s+/).filter(Boolean).length; // Split by whitespace and count
+
+    siteConfig['$page:wordcount'] = wordCount;
+    siteConfig['$page:linkcount'] = document.querySelectorAll('a').length;
+    siteConfig['$page:readspeed'] = Math.ceil(wordCount / 60 + 1).toString();
+    siteConfig['$page:title'] = document.title;
+    siteConfig['$page:description'] = document.querySelector('meta[name="description"]');
+    siteConfig['$page:keywords'] = document.querySelector('meta[name="keywords"]');
+    siteConfig['$page:author'] = document.querySelector('meta[name="author"]');
+
     siteConfig['$page:canonical'] = href;
     siteConfig['$system:date'] = today;
     siteConfig['$system:time'] = new Date().toLocaleTimeString();
@@ -62,6 +74,9 @@ export async function loadConfiguration() {
           key = 'og:image_secure_url';
         }
         siteConfig[`$${prefix}${key}`] = value;
+      }
+      if (siteConfig['$page:author'] == null) {
+        siteConfig['$page:author'] = siteConfig['$company:name'];
       }
     });
   } catch (error) {
@@ -153,11 +168,27 @@ export async function initialize() {
   await loadConfiguration();
   initClientConfig();
   const main = document.querySelector('main');
-  let html = '';
   if (main) {
     removeCommentBlocks(main);
     handleMetadataJsonLd(main);
-    html = replaceTokens(siteConfig, (document.querySelector('html').outerText));
+    const metadataNames = [
+      'pageAuthor',
+      'pagereviewdate',
+      'pageembargodate',
+      'pagepublisheddate',
+      'pagecopyright',
+      'pagecopyright-cc',
+    ];
+
+    // Loop through the array of metadata names
+    metadataNames.forEach((name) => {
+      // Select all elements with the specified name attribute
+      const elements = document.querySelectorAll(`meta[name="${name}"]`);
+
+      // Loop through the NodeList of elements and remove each one
+      elements.forEach((element) => {
+        element.remove();
+      });
+    });
   }
-  return html;
 }
