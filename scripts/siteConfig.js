@@ -41,7 +41,10 @@ export async function loadConfiguration() {
         if (!name.includes(":'")) {
           prefix = 'meta:';
         }
-        siteConfig[`$${prefix}${name}`] = content.replace('meta:twitter:', 'twitter:');
+        if (name.includes('meta:og:') || name.includes('meta:twitter:')) {
+          name.replace('meta:', '');
+        }
+        siteConfig[`$${prefix}${name}`] = content;
       }
     });
   } catch (error) {
