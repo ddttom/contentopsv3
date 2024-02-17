@@ -30,10 +30,25 @@ export async function loadConfiguration() {
     }
     siteConfig['$page:canonical'] = href;
     siteConfig['$system:date'] = today;
+    siteConfig['$system:time'] = new Date().toLocaleTimeString();
+    siteConfig['$system:timezone'] = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    siteConfig['$system:locale'] = Intl.DateTimeFormat().resolvedOptions().locale;
+    siteConfig['$system:language'] = Intl.DateTimeFormat().resolvedOptions().language;
+    siteConfig['$system:country'] = Intl.DateTimeFormat().resolvedOptions().country;
+    siteConfig['$system:region'] = Intl.DateTimeFormat().resolvedOptions().region;
+    siteConfig['$system:variant'] = Intl.DateTimeFormat().resolvedOptions().variant;
+    siteConfig['$system:year'] = new Date().getFullYear();
+    siteConfig['$system:month'] = new Date().getMonth() + 1;
+    siteConfig['$system:day'] = new Date().getDate();
+    siteConfig['$system:hour'] = new Date().getHours();
+    siteConfig['$system:minute'] = new Date().getMinutes();
+    siteConfig['$system:second'] = new Date().getSeconds();
+    siteConfig['$system:millisecond'] = new Date().getMilliseconds();
+
     const metaTags = document.querySelectorAll('meta');
 
     metaTags.forEach((metaTag) => {
-      const key = metaTag.getAttribute('name') || metaTag.getAttribute('property');
+      let key = metaTag.getAttribute('name') || metaTag.getAttribute('property');
       const value = metaTag.getAttribute('content');
       if (key && value) {
         let prefix = '';
@@ -42,6 +57,9 @@ export async function loadConfiguration() {
         }
         if (key.includes('meta:og:') || key.includes('meta:twitter:')) {
           key.replace('meta:', '');
+        }
+        if (key === 'og:image:secure_url') {
+          key = 'og:image_secure_url';
         }
         siteConfig[`$${prefix}${key}`] = value;
       }
@@ -138,5 +156,6 @@ export async function initialize() {
   if (main) {
     removeCommentBlocks(main);
     handleMetadataJsonLd(main);
+    replaceTokens(siteConfig, main);
   }
 }
