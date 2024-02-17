@@ -37,7 +37,11 @@ export async function loadConfiguration() {
       const content = metaTag.getAttribute('content');
 
       if (name && content) {
-        siteConfig[`$${name}`] = content;
+        let prefix = '';
+        if (!name.includes(":'")) {
+          prefix = 'page:';
+        }
+        siteConfig[`${prefix}${name}`] = content;
       }
     });
   } catch (error) {
