@@ -33,7 +33,7 @@ export async function loadConfiguration() {
     const metaTags = document.querySelectorAll('meta');
 
     metaTags.forEach((metaTag) => {
-      const name = metaTag.getAttribute('name');
+      const name = metaTag.getAttribute('name') || metaTag.getAttribute('property');
       const content = metaTag.getAttribute('content');
 
       if (name && content) {
