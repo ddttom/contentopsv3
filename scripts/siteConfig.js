@@ -153,9 +153,11 @@ export async function initialize() {
   await loadConfiguration();
   initClientConfig();
   const main = document.querySelector('main');
+  let html = '';
   if (main) {
     removeCommentBlocks(main);
     handleMetadataJsonLd(main);
-    replaceTokens(siteConfig, document.querySelector('html'));
+    html = replaceTokens(siteConfig, (document.querySelector('html').outerText));
   }
+  return html;
 }
