@@ -33,18 +33,17 @@ export async function loadConfiguration() {
     const metaTags = document.querySelectorAll('meta');
 
     metaTags.forEach((metaTag) => {
-      const name = metaTag.getAttribute('name') || metaTag.getAttribute('property');
-      const content = metaTag.getAttribute('content');
-
-      if (name && content) {
+      const key = metaTag.getAttribute('name') || metaTag.getAttribute('property');
+      const value = metaTag.getAttribute('content');
+      if (key && value) {
         let prefix = '';
-        if (!name.includes(":'")) {
+        if (!key.includes(':')) {
           prefix = 'meta:';
         }
-        if (name.includes('meta:og:') || name.includes('meta:twitter:')) {
-          name.replace('meta:', '');
+        if (key.includes('meta:og:') || key.includes('meta:twitter:')) {
+          key.replace('meta:', '');
         }
-        siteConfig[`$${prefix}${name}`] = content;
+        siteConfig[`$${prefix}${key}`] = value;
       }
     });
   } catch (error) {
@@ -52,6 +51,7 @@ export async function loadConfiguration() {
     console.error(`Configuration load error: ${error.message}`);
     throw error; // Rethrow for potential handling at a higher level
   }
+  return siteConfig;
 }
 
 export function extractJsonLd(parsedJson) {
