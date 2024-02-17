@@ -39,7 +39,7 @@ export async function loadConfiguration() {
       if (name && content) {
         let prefix = '';
         if (!name.includes(":'")) {
-          prefix = 'page:';
+          prefix = 'meta:';
         }
         siteConfig[`${prefix}${name}`] = content;
       }
