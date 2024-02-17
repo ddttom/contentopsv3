@@ -182,12 +182,12 @@ export async function initialize() {
     const firstH1 = document.querySelector('h1');
     if (firstH1) {
       // Construct the string you want to append
-      const appendString = `Word Count = ${siteConfig['$page:wordcount']}, <strong>${siteConfig['$page:readspeed']} </strong>minute(s) to read this page.`;
+      const appendString = `${siteConfig['$page:readspeed']} </strong>minute(s) reading.`;
       // Append the constructed string to the h1 element's current content
       const newElement = document.createElement('div');
       newElement.className = 'byLine';
       newElement.innerHTML = appendString;
-      firstH1.appendChild(newElement);
+      firstH1.insertAdjacentElement('afterend', newElement);
     }
 
     // Loop through the array of metadata names
