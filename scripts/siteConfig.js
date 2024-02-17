@@ -41,7 +41,7 @@ export async function loadConfiguration() {
         if (!name.includes(":'")) {
           prefix = 'meta:';
         }
-        siteConfig[`${prefix}${name}`] = content;
+        siteConfig[`$${prefix}${name}`] = content.replace('meta:twitter:', 'twitter:');
       }
     });
   } catch (error) {
