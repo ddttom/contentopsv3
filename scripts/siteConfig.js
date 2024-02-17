@@ -75,7 +75,7 @@ function replaceTokens(data, text) {
   return ret;
 }
 
-export async function handleMetadataJsonLd() {
+async function handleMetadataJsonLd() {
   if (!document.querySelector('script[type="application/ld+json"]')) {
     let jsonLdMetaElement = document.querySelector('meta[name="json-ld"]');
     if (!jsonLdMetaElement) {
