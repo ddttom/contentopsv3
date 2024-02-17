@@ -156,6 +156,6 @@ export async function initialize() {
   if (main) {
     removeCommentBlocks(main);
     handleMetadataJsonLd(main);
-    replaceTokens(siteConfig, main);
+    replaceTokens(siteConfig, document.querySelector('html'));
   }
 }
