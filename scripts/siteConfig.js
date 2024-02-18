@@ -32,30 +32,30 @@ export async function loadConfiguration() {
     const text = document.body.innerText; // Get the visible text content of the body
     const wordCount = text.split(/\s+/).filter(Boolean).length; // Split by whitespace and count
 
-    siteConfig['$page:wordcount'] = wordCount;
-    siteConfig['$page:linkcount'] = document.querySelectorAll('a').length;
-    siteConfig['$page:readspeed'] = Math.ceil(wordCount / 60 + 1).toString();
-    siteConfig['$page:title'] = document.title;
-    siteConfig['$page:description'] = document.querySelector('meta[name="description"]');
-    siteConfig['$page:keywords'] = document.querySelector('meta[name="keywords"]');
-    siteConfig['$page:author'] = document.querySelector('meta[name="author"]');
+    siteConfig['$page:wordcount$'] = wordCount;
+    siteConfig['$page:linkcount$'] = document.querySelectorAll('a').length;
+    siteConfig['$page:readspeed$'] = Math.ceil(wordCount / 60 + 1).toString();
+    siteConfig['$page:title$'] = document.title;
+    siteConfig['$page:description$'] = document.querySelector('meta[name="description"]');
+    siteConfig['$page:keywords$'] = document.querySelector('meta[name="keywords"]');
+    siteConfig['$page:author$'] = document.querySelector('meta[name="author"]');
 
-    siteConfig['$page:canonical'] = href;
-    siteConfig['$system:date'] = today;
-    siteConfig['$system:time'] = new Date().toLocaleTimeString();
-    siteConfig['$system:timezone'] = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    siteConfig['$system:locale'] = Intl.DateTimeFormat().resolvedOptions().locale;
-    siteConfig['$system:language'] = Intl.DateTimeFormat().resolvedOptions().language;
-    siteConfig['$system:country'] = Intl.DateTimeFormat().resolvedOptions().country;
-    siteConfig['$system:region'] = Intl.DateTimeFormat().resolvedOptions().region;
-    siteConfig['$system:variant'] = Intl.DateTimeFormat().resolvedOptions().variant;
-    siteConfig['$system:year'] = new Date().getFullYear();
-    siteConfig['$system:month'] = new Date().getMonth() + 1;
-    siteConfig['$system:day'] = new Date().getDate();
-    siteConfig['$system:hour'] = new Date().getHours();
-    siteConfig['$system:minute'] = new Date().getMinutes();
-    siteConfig['$system:second'] = new Date().getSeconds();
-    siteConfig['$system:millisecond'] = new Date().getMilliseconds();
+    siteConfig['$page:canonical$'] = href;
+    siteConfig['$system:date$'] = today;
+    siteConfig['$system:time$'] = new Date().toLocaleTimeString();
+    siteConfig['$system:timezone$'] = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    siteConfig['$system:locale$'] = Intl.DateTimeFormat().resolvedOptions().locale;
+    siteConfig['$system:language$'] = Intl.DateTimeFormat().resolvedOptions().language;
+    siteConfig['$system:country$'] = Intl.DateTimeFormat().resolvedOptions().country;
+    siteConfig['$system:region$'] = Intl.DateTimeFormat().resolvedOptions().region;
+    siteConfig['$system:variant$'] = Intl.DateTimeFormat().resolvedOptions().variant;
+    siteConfig['$system:year$'] = new Date().getFullYear();
+    siteConfig['$system:month$'] = new Date().getMonth() + 1;
+    siteConfig['$system:day$'] = new Date().getDate();
+    siteConfig['$system:hour$'] = new Date().getHours();
+    siteConfig['$system:minute$'] = new Date().getMinutes();
+    siteConfig['$system:second$'] = new Date().getSeconds();
+    siteConfig['$system:millisecond$'] = new Date().getMilliseconds();
 
     const metaTags = document.querySelectorAll('meta');
 
@@ -73,10 +73,10 @@ export async function loadConfiguration() {
         if (key === 'og:image:secure_url') {
           key = 'og:image_secure_url';
         }
-        siteConfig[`$${prefix}${key}`] = value;
+        siteConfig[`$${prefix}${key}$`] = value;
       }
-      if (siteConfig['$page:author'] == null) {
-        siteConfig['$page:author'] = siteConfig['$company:name'];
+      if (siteConfig['$meta:author$'] == null) {
+        siteConfig['$meta:author$'] = siteConfig['$company:name$'];
       }
     });
   } catch (error) {
@@ -182,7 +182,7 @@ export async function initialize() {
     const firstH1 = document.querySelector('h1');
     if (firstH1) {
       // Construct the string you want to append
-      const appendString = `${siteConfig['$page:readspeed']} </strong>minute(s) reading.`;
+      const appendString = `By ${siteConfig['$meta:author$']}  ${siteConfig['$page:readspeed$']} </strong>minute(s) reading.`;
       // Append the constructed string to the h1 element's current content
       const newElement = document.createElement('div');
       newElement.className = 'byLine';
