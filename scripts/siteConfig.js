@@ -172,7 +172,6 @@ export async function initialize() {
     removeCommentBlocks(main);
     handleMetadataJsonLd(main);
     const metadataNames = [
-      'pageauthor',
       'pagereviewdate',
       'pageembargodate',
       'pagepublisheddate',
@@ -182,7 +181,7 @@ export async function initialize() {
     const firstH1 = document.querySelector('h1');
     if (firstH1) {
       // Construct the string you want to append
-      const appendString = `By ${siteConfig['$meta:author$']}  ${siteConfig['$page:readspeed$']} </strong>minute(s) reading.`;
+      const appendString = `Published ${siteConfig['$system:date$']}, By ${siteConfig['$meta:author$']},  ${siteConfig['$page:readspeed$']} </strong>minute(s) reading.`;
       // Append the constructed string to the h1 element's current content
       const newElement = document.createElement('div');
       newElement.className = 'byLine';
