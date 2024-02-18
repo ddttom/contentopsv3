@@ -32,6 +32,7 @@ export async function loadConfiguration() {
     const text = document.body.innerText; // Get the visible text content of the body
     const wordCount = text.split(/\s+/).filter(Boolean).length; // Split by whitespace and count
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const thismonth = new Date().getMonth();
     siteConfig['$page:wordcount$'] = wordCount;
     siteConfig['$page:linkcount$'] = document.querySelectorAll('a').length;
     siteConfig['$page:readspeed$'] = Math.ceil(wordCount / 60 + 1).toString();
@@ -45,8 +46,8 @@ export async function loadConfiguration() {
     siteConfig['$system:timezone$'] = Intl.DateTimeFormat().resolvedOptions().timeZone;
     siteConfig['$system:locale$'] = Intl.DateTimeFormat().resolvedOptions().locale;
     siteConfig['$system:year$'] = new Date().getFullYear();
-    siteConfig['$system:month$'] = new Date().getMonth() + 1;
-    siteConfig['$system:monthinfull$'] = months[new Date().getmonth()];
+    siteConfig['$system:month$'] = thismonth + 1;
+    siteConfig['$system:monthinfull$'] = months[thismonth];
     siteConfig['$system:day$'] = new Date().getDate();
     siteConfig['$system:hour$'] = new Date().getHours();
     siteConfig['$system:minute$'] = new Date().getMinutes();
