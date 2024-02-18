@@ -50,7 +50,7 @@ export async function loadConfiguration() {
     siteConfig['$system:minute$'] = new Date().getMinutes();
     siteConfig['$system:second$'] = new Date().getSeconds();
     siteConfig['$system:millisecond$'] = new Date().getMilliseconds();
-    siteConfig['$system:dateinenglish$'] = `${siteConfig['$system:monthinfull$']} ${siteConfig['$system:day$']} , ${siteConfig['$system:year$']}`;
+    siteConfig['$system:dateinenglish$'] = `${siteConfig['$system:monthinfull$']} ${siteConfig['$system:day$']}, ${siteConfig['$system:year$']}`;
 
     const metaTags = document.querySelectorAll('meta');
 
@@ -176,7 +176,7 @@ export async function initialize() {
     if (siteConfig['$system:addbyline$'] === 'true') {
       const firstH1 = document.querySelector('h1');
       if (firstH1) {
-        const appendString = `Published ${siteConfig['$system:dateinenglish$']}, By ${siteConfig['$meta:author$']},  ${siteConfig['$page:readspeed$']} </strong>minute(s) reading.`;
+        const appendString = `Published: ${siteConfig['$system:dateinenglish$']}; By ${siteConfig['$meta:author$']},  ${siteConfig['$page:readspeed$']} </strong>minute(s) reading.`;
         // Append the constructed string to the h1 element's current content
         const newElement = document.createElement('div');
         newElement.className = 'byLine';
