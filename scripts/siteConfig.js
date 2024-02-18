@@ -37,9 +37,6 @@ export async function loadConfiguration() {
     siteConfig['$page:linkcount$'] = document.querySelectorAll('a').length;
     siteConfig['$page:readspeed$'] = Math.ceil(wordCount / 60 + 1).toString();
     siteConfig['$page:title$'] = document.title;
-    siteConfig['$page:description$'] = document.querySelector('meta[name="description"]');
-    siteConfig['$page:keywords$'] = document.querySelector('meta[name="keywords"]');
-    siteConfig['$page:author$'] = document.querySelector('meta[name="author"]');
     siteConfig['$page:canonical$'] = href;
     siteConfig['$system:date$'] = today;
     siteConfig['$system:time$'] = new Date().toLocaleTimeString();
@@ -53,7 +50,7 @@ export async function loadConfiguration() {
     siteConfig['$system:minute$'] = new Date().getMinutes();
     siteConfig['$system:second$'] = new Date().getSeconds();
     siteConfig['$system:millisecond$'] = new Date().getMilliseconds();
-    siteConfig['$system:dateinenglish$'] = `${siteConfig['system:month']} ${new Date().getDate()}, ${new Date().getFullYear}`;
+    siteConfig['$system:dateinenglish$'] = `${siteConfig['$system:monthinfull$']} ${siteConfig['$system:day$']} , ${siteConfig['$system:year$']}`;
 
     const metaTags = document.querySelectorAll('meta');
 
