@@ -172,6 +172,8 @@ export async function initialize() {
       'pagepublisheddate',
       'pagecopyright',
       'pagecopyright-cc',
+      'videourl',
+
     ];
     if (siteConfig['$system:addbyline$'] === 'true') {
       const firstH1 = document.querySelector('h1');

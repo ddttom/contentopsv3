@@ -8,7 +8,7 @@
       "@type": "VideoObject",
       "name": "$page:title$",
       "description": "$meta:longdescription$", 
-      "contentUrl": "$page:videourl$"
+      "contentUrl": "$meta:videourl$"
     }
   }
   
