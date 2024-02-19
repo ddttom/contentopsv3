@@ -35,7 +35,7 @@ export async function loadConfiguration() {
     const thismonth = new Date().getMonth();
     siteConfig['$page:wordcount$'] = wordCount;
     siteConfig['$page:linkcount$'] = document.querySelectorAll('a').length;
-    siteConfig['$page:readspeed$'] = Math.ceil(wordCount / 60 + 1).toString();
+    siteConfig['$page:readspeed$'] = (Math.ceil(wordCount / 120) + 1).toString();
     siteConfig['$page:title$'] = document.title;
     siteConfig['$page:canonical$'] = href;
     siteConfig['$system:date$'] = today;

@@ -1,28 +1,28 @@
 {
     "@context": "https://schema.org/",
     "@type": "Article",
-    "headline": "$meta:title",
-    "description": "$meta:longdescription",
+    "headline": "$meta:title$",
+    "description": "$meta:longdescription$",
     "author": {
       "@type": "Person",
-      "name": "$meta:author"
+      "name": "$meta:author$"
     },
-    "datePublished": "$system:date",
+    "datePublished": "$system:dateinenglish$",
     "image": {
       "@type": "ImageObject",
-      "url": "$twitter:image",
-      "description": "$twitter:description" 
+      "url": "$twitter:image$",
+      "description": "$twitter:description$" 
     },
     "publisher": {
       "@type": "Organization",
-      "name": "$company:name",
+      "name": "$company:name$",
       "logo": {
         "@type": "ImageObject",
-        "url": "company:logo"
+        "url": "$company:logo$"
       }
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": "$page:canonical" 
+      "@id": "$page:canonical$" 
     }
   }
