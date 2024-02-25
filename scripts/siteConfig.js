@@ -175,8 +175,8 @@ export async function initialize() {
       'videourl',
 
     ];
+    const firstH1 = document.querySelector('h1');
     if (siteConfig['$system:addbyline$'] === 'true') {
-      const firstH1 = document.querySelector('h1');
       if (firstH1) {
         const appendString = `Published: ${siteConfig['$system:dateinenglish$']}; By ${siteConfig['$meta:author$']},  ${siteConfig['$page:readspeed$']} </strong>minute(s) reading.`;
         // Append the constructed string to the h1 element's current content
