@@ -1,13 +1,13 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable prefer-destructuring */
 import {
   initialize as initClientConfig,
 } from './clientConfig.js';
 
-export const siteConfig = {};
+// import { handleMetadataTracking } from './adobe-metadata.js';
+import { replaceTokens, logError } from './meta-helper.js';
 
-export function alert(message) {
-  // eslint-disable-next-line no-console
-  console.error(message);
-}
+export const siteConfig = {};
 
 export async function loadConfiguration() {
   const configUrl = new URL('/config/variables.json', window.location.origin);
@@ -22,23 +22,32 @@ export async function loadConfiguration() {
     for (const entry of jsonData.data) {
       siteConfig[entry.Item] = entry.Value;
     }
-    const today = new Date().toISOString().split('T')[0];
+    const now = new Date().toISOString();
+    const today = now.split('T')[0];
     let href = '';
     const canonicalLink = document.querySelector('link[rel="canonical"]');
     if (canonicalLink) { // Make sure the element was found
       href = canonicalLink.href;
     }
+    const pname = new URL(window.location.href).pathname;
 
     const text = document.body.innerText; // Get the visible text content of the body
     const wordCount = text.split(/\s+/).filter(Boolean).length; // Split by whitespace and count
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const thismonth = new Date().getMonth();
+    const winloc = window.location.href;
+    siteConfig['$page.location$'] = winloc;
+    siteConfig['$page:url$'] = href;
+    siteConfig['$page:name$'] = pname;
+    siteConfig['$page:path$'] = (`${winloc}?`).split('?')[0];
     siteConfig['$page:wordcount$'] = wordCount;
     siteConfig['$page:linkcount$'] = document.querySelectorAll('a').length;
     siteConfig['$page:readspeed$'] = (Math.ceil(wordCount / 120) + 1).toString();
     siteConfig['$page:title$'] = document.title;
     siteConfig['$page:canonical$'] = href;
+    siteConfig['$system:platformVersion$'] = 'Franklin++ 1.0.0';
     siteConfig['$system:date$'] = today;
+    siteConfig['$system:isodate$'] = now;
     siteConfig['$system:time$'] = new Date().toLocaleTimeString();
     siteConfig['$system:timezone$'] = Intl.DateTimeFormat().resolvedOptions().timeZone;
     siteConfig['$system:locale$'] = Intl.DateTimeFormat().resolvedOptions().locale;
@@ -73,6 +82,9 @@ export async function loadConfiguration() {
       if (siteConfig['$meta:author$'] == null) {
         siteConfig['$meta:author$'] = siteConfig['$company:name$'];
       }
+      if (siteConfig['$meta:contentauthor$'] == null) {
+        siteConfig['$meta:contentauthor$'] = siteConfig['$meta:author$'];
+      }
     });
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -98,16 +110,6 @@ export function extractJsonLd(parsedJson) {
     return jsonLd;
   }
   return parsedJson;
-}
-
-function replaceTokens(data, text) {
-  let ret = text;
-  // eslint-disable-next-line no-restricted-syntax, guard-for-in
-  for (const key in data) {
-    const value = data[key];
-    ret = ret.replaceAll(key, value);
-  }
-  return ret;
 }
 
 async function handleMetadataJsonLd() {
@@ -150,7 +152,7 @@ async function handleMetadataJsonLd() {
       document.querySelectorAll('meta[name="longdescription"]').forEach((section) => section.remove());
     } catch (error) {
     // no schema.org for your content, just use the content as is
-      alert('Error processing JSON-LD metadata:', error);
+      logError('Error processing JSON-LD metadata:', error);
     }
   }
 }
@@ -162,19 +164,34 @@ export function removeCommentBlocks() {
 export async function initialize() {
   await loadConfiguration();
   initClientConfig();
-  const main = document.querySelector('main');
-  if (main) {
-    removeCommentBlocks(main);
-    handleMetadataJsonLd(main);
-    const metadataNames = [
-      'pagereviewdate',
-      'pageembargodate',
-      'pagepublisheddate',
-      'pagecopyright',
-      'pagecopyright-cc',
-      'videourl',
-
-    ];
+  removeCommentBlocks();
+  handleMetadataJsonLd();
+  // handleMetadataTracking(siteConfig);
+  const metadataNames = [
+    'pagereviewdate',
+    'pageembargodate',
+    'pagepublisheddate',
+    'pagecopyright',
+    'pagecopyright-cc',
+    'videourl',
+    'contenttype',
+    'contenttopic',
+    'contenttechnology',
+    'contentcompany',
+    'contentindustry',
+    'tracking',
+    'category',
+    'contenttitle',
+    'contentauthor',
+    'lang',
+  ];
+  if (siteConfig['$meta:lang$']) {
+    document.querySelector('html').setAttribute('lang', siteConfig['$meta:lang$']);
+    if (siteConfig['$meta:lang$'] === 'ar') {
+      document.querySelector('html').setAttribute('dir', 'rtl');
+    }
+  }
+  if (siteConfig['$system:addbyline$'] === 'true') {
     const firstH1 = document.querySelector('h1');
     if (siteConfig['$system:addbyline$'] === 'true') {
       if (firstH1) {
