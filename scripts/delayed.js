@@ -5,8 +5,6 @@ import { sampleRUM, loadScript } from './aem.js';
 sampleRUM('cwv');
 // add more delayed functionality here
 
-if (window.cmsplus.bubbleallowed === true) {
-  window.danteEmbed = `https://chat.dante-ai.com/embed?${window.cmsplus.bubble}&mode=false&bubble=true&image=null&bubbleopen=false`;
-  loadScript('https://chat.dante-ai.com/bubble-embed.js');
-  loadScript('https://chat.dante-ai.com/dante-embed.js');
-}
+window.danteEmbed = `https://chat.dante-ai.com/embed?${window.cmsplus.bubble}&mode=false&bubble=true&image=null&bubbleopen=false`;
+loadScript('https://chat.dante-ai.com/bubble-embed.js');
+loadScript('https://chat.dante-ai.com/dante-embed.js');
