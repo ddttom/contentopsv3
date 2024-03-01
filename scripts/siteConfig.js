@@ -8,6 +8,7 @@ import {
 import { replaceTokens, logError } from './meta-helper.js';
 
 export const siteConfig = {};
+window.cmsplus = window.cmsplus || {};
 
 export async function loadConfiguration() {
   const configUrl = new URL('/config/variables.json', window.location.origin);
@@ -36,13 +37,25 @@ export async function loadConfiguration() {
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const thismonth = new Date().getMonth();
     const winloc = window.location.href;
+    let environment = 'unknown';
+    if (window.location.href.includes('hlx.page')) {
+      environment = 'stage';
+    }
+    if (window.location.href.includes('hlx.live')) {
+      environment = 'production';
+    }
+    if (window.location.href.includes('localhost')) {
+      environment = 'dev';
+    }
+    window.cmsplus.environment = environment;
+    siteConfig['$system:environment$'] = environment;
     siteConfig['$page.location$'] = winloc;
     siteConfig['$page:url$'] = href;
     siteConfig['$page:name$'] = pname;
     siteConfig['$page:path$'] = (`${winloc}?`).split('?')[0];
     siteConfig['$page:wordcount$'] = wordCount;
     siteConfig['$page:linkcount$'] = document.querySelectorAll('a').length;
-    siteConfig['$page:readspeed$'] = (Math.ceil(wordCount / 120) + 1).toString();
+    siteConfig['$page:readspeed$'] = (Math.ceil(wordCount / 140) + 1).toString();
     siteConfig['$page:title$'] = document.title;
     siteConfig['$page:canonical$'] = href;
     siteConfig['$system:platformVersion$'] = 'Franklin++ 1.0.0';
@@ -60,7 +73,37 @@ export async function loadConfiguration() {
     siteConfig['$system:second$'] = new Date().getSeconds();
     siteConfig['$system:millisecond$'] = new Date().getMilliseconds();
     siteConfig['$system:dateinenglish$'] = `${siteConfig['$system:monthinfull$']} ${siteConfig['$system:day$']}, ${siteConfig['$system:year$']}`;
+    const metaTitle = document.querySelector('meta[name="title"]');
 
+    if (!metaTitle) {
+      // 1. Attempt to find the first H1 tag
+      let h1 = document.querySelector('h1');
+      // 2. If no H1 found, get the first text node
+      if (!h1) {
+        const findFirstText = (node) => {
+          // eslint-disable-next-line no-restricted-syntax
+          for (const child of node.childNodes) {
+            if (child.nodeType === Node.TEXT_NODE && child.textContent.trim()) {
+              return child;
+            }
+            const found = findFirstText(child);
+            if (found) return found;
+          }
+          return null; // No text node found at all
+        };
+        const firstText = findFirstText(document.body);
+        h1 = firstText; // Treat the text node as a source
+      }
+      // 3. Extract the first line, with basic trimming
+      if (h1) {
+        const firstLine = h1.textContent.split('\n')[0].trim();
+        // 4. Create and set the meta tag
+        const title = document.createElement('meta');
+        title.name = 'title';
+        title.content = firstLine;
+        document.head.appendChild(title);
+      }
+    }
     const metaTags = document.querySelectorAll('meta');
 
     metaTags.forEach((metaTag) => {
@@ -89,8 +132,18 @@ export async function loadConfiguration() {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(`Configuration load error: ${error.message}`);
-    throw error; // Rethrow for potential handling at a higher level
+    throw error;
   }
+  // make the required globals
+  let buildscript = 'window.cmsplus = window.cmsplus || {};\n';
+  const delay = siteConfig['$meta:analyticsdelay1$'] === undefined ? 3000 : siteConfig['$meta:analyticsdelay1$'];
+  const bubbleapikey = siteConfig['$system:bubbleapikey$'] === undefined ? '' : siteConfig['$system:bubbleapikey$'];
+  buildscript += `window.cmsplus.analyticsdelay = ${delay};\nwindow.cmsplus.bubble = "${bubbleapikey}";\n`;
+  buildscript += `window.cmsplus.environment = "${window.cmsplus.environment}";\n`;
+  const script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.textContent = buildscript;
+  document.head.appendChild(script);
   return siteConfig;
 }
 
@@ -184,6 +237,7 @@ export async function initialize() {
     'contenttitle',
     'contentauthor',
     'lang',
+    'analyticsdelay',
   ];
   if (siteConfig['$meta:lang$']) {
     document.querySelector('html').setAttribute('lang', siteConfig['$meta:lang$']);
