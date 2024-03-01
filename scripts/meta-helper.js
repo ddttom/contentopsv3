@@ -3,8 +3,11 @@ export function replaceTokens(data, text) {
   let ret = text;
   // eslint-disable-next-line no-restricted-syntax, guard-for-in
   for (const key in data) {
-    const value = data[key];
-    ret = ret.replaceAll(key, value);
+    if (Object.hasOwnProperty.call(data, key)) {
+      const item = key;
+      const value = data[item];
+      ret = ret.replaceAll(item, value);
+    }
   }
   return ret;
 }
